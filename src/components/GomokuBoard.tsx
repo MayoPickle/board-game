@@ -46,7 +46,7 @@ export const GomokuBoard: React.FC<GomokuBoardProps> = ({
 
   return (
     <div className="board-container overflow-auto">
-      <div className="board-bg p-4 rounded-xl shadow-lg border border-amber-300 dark:border-amber-800">
+      <div className="board-bg p-4 rounded-xl shadow-xl border-2 border-amber-300 dark:border-amber-700 overflow-hidden">
         {/* Board with coordinates and lines */}
         <div className="flex flex-col">
           {/* Top row for column coordinates */}
@@ -59,9 +59,6 @@ export const GomokuBoard: React.FC<GomokuBoardProps> = ({
               <div 
                 key={`col-${label}`} 
                 className="flex items-center justify-center w-8 h-6 text-xs font-medium opacity-80"
-                style={{
-                  transform: index === 0 ? 'translateX(0)' : 'translateX(0)',
-                }}
               >
                 {label}
               </div>
@@ -76,9 +73,6 @@ export const GomokuBoard: React.FC<GomokuBoardProps> = ({
                 <div 
                   key={`row-${label}`} 
                   className="flex items-center justify-center h-8 w-6 text-xs font-medium opacity-80"
-                  style={{
-                    transform: index === 0 ? 'translateY(0)' : 'translateY(0)',
-                  }}
                 >
                   {label}
                 </div>
@@ -89,17 +83,18 @@ export const GomokuBoard: React.FC<GomokuBoardProps> = ({
             <div className="relative gomoku-board">
               {/* Board grid lines - Traditional style with lines */}
               <div 
-                className="relative bg-amber-200 dark:bg-amber-800"
+                className="relative bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/30 dark:to-amber-800"
                 style={{ 
                   width: `${(BOARD_SIZE-1) * cellSize}px`, 
                   height: `${(BOARD_SIZE-1) * cellSize}px`,
+                  boxShadow: 'inset 0 0 20px rgba(0,0,0,0.05)'
                 }}
               >
                 {/* Horizontal lines */}
                 {Array.from({ length: BOARD_SIZE }).map((_, index) => (
                   <div 
                     key={`h-line-${index}`}
-                    className="absolute w-full h-[1px] bg-black/70 dark:bg-white/70"
+                    className="absolute w-full h-[1px] bg-black/60 dark:bg-white/60"
                     style={{ top: `${index * cellSize}px` }}
                   />
                 ))}
@@ -108,7 +103,7 @@ export const GomokuBoard: React.FC<GomokuBoardProps> = ({
                 {Array.from({ length: BOARD_SIZE }).map((_, index) => (
                   <div 
                     key={`v-line-${index}`}
-                    className="absolute h-full w-[1px] bg-black/70 dark:bg-white/70"
+                    className="absolute h-full w-[1px] bg-black/60 dark:bg-white/60"
                     style={{ left: `${index * cellSize}px` }}
                   />
                 ))}
@@ -119,9 +114,14 @@ export const GomokuBoard: React.FC<GomokuBoardProps> = ({
                     <div 
                       key={`${rowIndex}-${colIndex}`}
                       className={`
-                        absolute w-8 h-8 -ml-4 -mt-4
+                        absolute w-8 h-8 -ml-4 -mt-4 
                         flex items-center justify-center gomoku-intersection
-                        ${isPlayerTurn && !gameOver && cell === null ? 'cursor-pointer hover:bg-indigo-200/30 hover:rounded-full' : ''}
+                        ${isPlayerTurn && !gameOver && cell === null 
+                          ? 'cursor-pointer hover:before:bg-purple-400/20 hover:before:scale-100' 
+                          : ''
+                        }
+                        before:content-[''] before:absolute before:w-6 before:h-6 before:rounded-full 
+                        before:scale-0 before:transition-transform before:duration-150
                       `}
                       style={{
                         left: `${colIndex * cellSize}px`,
@@ -132,7 +132,7 @@ export const GomokuBoard: React.FC<GomokuBoardProps> = ({
                       {cell && (
                         <div 
                           className={`
-                            rounded-full w-7 h-7 gomoku-stone
+                            rounded-full w-6 h-6 gomoku-stone z-10
                             ${cell === 'black' ? 'black' : 'white'}
                             scale-in
                           `}
@@ -143,11 +143,14 @@ export const GomokuBoard: React.FC<GomokuBoardProps> = ({
                 )}
                 
                 {/* Star points (天元和星) */}
-                <div className="absolute left-1/2 top-1/2 w-2 h-2 bg-black dark:bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-                <div className="absolute left-1/4 top-1/4 w-2 h-2 bg-black dark:bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-                <div className="absolute left-3/4 top-1/4 w-2 h-2 bg-black dark:bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-                <div className="absolute left-1/4 top-3/4 w-2 h-2 bg-black dark:bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-                <div className="absolute left-3/4 top-3/4 w-2 h-2 bg-black dark:bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                {/* Center point (天元) */}
+                <div className="absolute left-1/2 top-1/2 w-[5px] h-[5px] bg-black/80 dark:bg-white/80 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                
+                {/* Corner star points (星) */}
+                <div className="absolute left-1/4 top-1/4 w-[5px] h-[5px] bg-black/80 dark:bg-white/80 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                <div className="absolute left-3/4 top-1/4 w-[5px] h-[5px] bg-black/80 dark:bg-white/80 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                <div className="absolute left-1/4 top-3/4 w-[5px] h-[5px] bg-black/80 dark:bg-white/80 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                <div className="absolute left-3/4 top-3/4 w-[5px] h-[5px] bg-black/80 dark:bg-white/80 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
               </div>
             </div>
           </div>

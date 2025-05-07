@@ -52,10 +52,13 @@ export default function GomokuPage() {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center p-4 md:p-24">
         <div className="game-container">
-          <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">五子棋</h1>
-          <div className="card flex items-center justify-center p-8">
+          <div className="text-center mb-8 slide-up">
+            <h1 className="text-3xl font-bold mb-2 brand-gradient">Rabbit Hole</h1>
+            <h2 className="text-xl mb-2">五子棋</h2>
+          </div>
+          <div className="card flex items-center justify-center p-8 slide-up">
             <div className="flex items-center gap-3">
-              <div className="animate-spin rounded-full h-6 w-6 border-2 border-indigo-500 border-t-transparent"></div>
+              <div className="animate-spin rounded-full h-6 w-6 border-2 border-purple-500 border-t-transparent"></div>
               <span>正在初始化游戏...</span>
             </div>
           </div>
@@ -67,10 +70,13 @@ export default function GomokuPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 md:p-24">
       <div className="game-container">
-        <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">五子棋</h1>
+        <div className="text-center mb-8 slide-up">
+          <h1 className="text-3xl font-bold mb-2 brand-gradient">Rabbit Hole</h1>
+          <h2 className="text-xl mb-2">五子棋</h2>
+        </div>
         
         {error && (
-          <div className="mb-6 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg flex items-center gap-2">
+          <div className="mb-6 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg flex items-center gap-2 fade-in">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
             </svg>
@@ -79,7 +85,7 @@ export default function GomokuPage() {
         )}
         
         {!isConnected && (
-          <div className="card flex items-center justify-center p-8">
+          <div className="card flex items-center justify-center p-8 slide-up">
             <div className="flex items-center gap-3">
               <div className="animate-spin rounded-full h-6 w-6 border-2 border-amber-500 border-t-transparent"></div>
               <span>正在连接服务器...</span>
@@ -88,25 +94,37 @@ export default function GomokuPage() {
         )}
 
         {isConnected && !gameState && (
-          <Lobby 
-            onCreateRoom={handleCreateRoom} 
-            onJoinRoom={handleJoinRoom} 
-          />
+          <div className="fade-in">
+            <Lobby 
+              onCreateRoom={handleCreateRoom} 
+              onJoinRoom={handleJoinRoom} 
+            />
+          </div>
         )}
         
         {isConnected && gameState && (
-          <GameRoom 
-            gameState={gameState} 
-            playerId={playerId} 
-            onMove={handleMove} 
-            onCreateNewRoom={handleCreateRoom}
-          />
+          <div className="fade-in">
+            <GameRoom 
+              gameState={gameState} 
+              playerId={playerId} 
+              onMove={handleMove} 
+              onCreateNewRoom={handleCreateRoom}
+            />
+          </div>
         )}
 
         <div className="mt-8 text-center">
           <p className="text-sm opacity-50">
-            连接状态: {isConnected ? '已连接' : '未连接'} | 
-            玩家ID: {playerId.substring(0, 8)}...
+            {isConnected ? 
+              <span className="inline-flex items-center gap-1">
+                <span className="h-2 w-2 bg-green-500 rounded-full"></span> 已连接
+              </span> : 
+              <span className="inline-flex items-center gap-1">
+                <span className="h-2 w-2 bg-red-500 rounded-full"></span> 未连接
+              </span>
+            }
+            <span className="mx-2">|</span>
+            <span className="text-xs opacity-70">ID: {playerId.substring(0, 8)}...</span>
           </p>
         </div>
       </div>

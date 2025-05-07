@@ -3,20 +3,43 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 30, 41, 59;
-  --background-rgb: 248, 250, 252;
-  --accent-rgb: 79, 70, 229;
-  --accent-light-rgb: 224, 231, 255;
-  --board-bg-rgb: 253, 230, 138;
+  /* 主要色彩 */
+  --primary: 124, 58, 237;       /* 紫色 */
+  --primary-light: 221, 214, 254;
+  --primary-dark: 91, 33, 182;
+  
+  /* 中性色彩 */
+  --bg-light: 250, 250, 252;
+  --bg-dark: 15, 23, 42;
+  --text-light: 30, 41, 59;
+  --text-dark: 241, 245, 249;
+  
+  /* 强调色彩 */
+  --accent: 236, 72, 153;        /* 粉色 */
+  --accent-light: 251, 207, 232;
+  --accent-dark: 190, 24, 93;
+  
+  /* 成功、警告和错误色彩 */
+  --success: 16, 185, 129;
+  --warning: 245, 158, 11;
+  --error: 239, 68, 68;
+  
+  /* 棋盘颜色 */
+  --board-bg: 251, 243, 219;
+  --board-bg-dark: 40, 30, 20;
+  --board-border: 251, 191, 36;
+  --board-border-dark: 180, 83, 9;
+
+  /* 默认亮色模式 */
+  --foreground-rgb: var(--text-light);
+  --background-rgb: var(--bg-light);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 241, 245, 249;
-    --background-rgb: 15, 23, 42;
-    --accent-rgb: 129, 140, 248;
-    --accent-light-rgb: 49, 46, 129;
-    --board-bg-rgb: 146, 64, 14;
+    /* 黑暗模式使用的变量 */
+    --foreground-rgb: var(--text-dark);
+    --background-rgb: var(--bg-dark);
   }
 }
 
@@ -26,8 +49,63 @@ body {
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+/* 应用动画 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.slide-up {
+  animation: slideUp 0.4s ease-out forwards;
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+/* 棋盘样式 */
 .board-bg {
-  background-color: rgb(var(--board-bg-rgb));
+  background-color: rgb(var(--board-bg));
+  border-color: rgb(var(--board-border));
+}
+
+.dark .board-bg {
+  background-color: rgb(var(--board-bg-dark));
+  border-color: rgb(var(--board-border-dark));
 }
 
 /* 棋子动画效果 */
@@ -63,6 +141,8 @@ body {
 .gomoku-board {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 
+              0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .gomoku-intersection:hover::before {
@@ -71,7 +151,7 @@ body {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background-color: rgba(79, 70, 229, 0.15);
+  background-color: rgba(var(--primary), 0.15);
   z-index: 0;
 }
 
@@ -90,26 +170,36 @@ body {
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
+/* 通用组件样式 */
 .btn-primary {
-  @apply px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
+  @apply px-4 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2;
 }
 
 .btn-secondary {
-  @apply px-4 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
+  @apply px-4 py-2 bg-pink-600 text-white rounded-lg shadow-md hover:bg-pink-700 transition-all focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2;
 }
 
 .btn-text {
-  @apply text-indigo-600 hover:text-indigo-800 transition-colors focus:outline-none focus:underline;
+  @apply text-purple-600 hover:text-purple-800 transition-colors focus:outline-none focus:underline;
 }
 
 .card {
-  @apply bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 border border-slate-200 dark:border-slate-700;
+  @apply bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 border border-slate-200 dark:border-slate-700 transition-all;
 }
 
 .input-field {
-  @apply w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700;
+  @apply w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-slate-700;
 }
 
 .game-container {
   @apply max-w-4xl mx-auto w-full;
+}
+
+/* 标题和品牌样式 */
+.brand-gradient {
+  @apply font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent;
+}
+
+.section-title {
+  @apply text-2xl font-bold mb-6;
 } 
