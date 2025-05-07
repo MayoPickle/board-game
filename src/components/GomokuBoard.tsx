@@ -40,61 +40,93 @@ export const GomokuBoard: React.FC<GomokuBoardProps> = ({
 
   // Generate row labels (1-15)
   const rowLabels = Array.from({ length: BOARD_SIZE }, (_, i) => i + 1);
+  
+  // Cell size in pixels
+  const cellSize = 32;
 
   return (
-    <div className="board-container">
+    <div className="board-container overflow-auto">
       <div className="board-bg p-4 rounded-xl shadow-lg border border-amber-300 dark:border-amber-800">
-        {/* Column coordinates (A-O) */}
-        <div className="flex mb-1 ml-7">
-          {columnLabels.map((label) => (
-            <div key={`col-${label}`} className="w-8 h-8 flex items-center justify-center text-xs opacity-70">
-              {label}
-            </div>
-          ))}
-        </div>
-        
-        <div className="flex">
-          {/* Row coordinates (1-15) */}
-          <div className="flex flex-col mr-1">
-            {rowLabels.map((label) => (
-              <div key={`row-${label}`} className="w-6 h-8 flex items-center justify-center text-xs opacity-70">
+        {/* Board with coordinates and lines */}
+        <div className="flex flex-col">
+          {/* Top row for column coordinates */}
+          <div className="flex h-6 mb-1">
+            {/* Empty corner for top-left */}
+            <div className="w-6"></div>
+            
+            {/* Column labels (A-O) */}
+            {columnLabels.map((label, index) => (
+              <div 
+                key={`col-${label}`} 
+                className="flex items-center justify-center w-8 h-6 text-xs font-medium opacity-80"
+                style={{
+                  transform: index === 0 ? 'translateX(0)' : 'translateX(0)',
+                }}
+              >
                 {label}
               </div>
             ))}
           </div>
           
-          {/* Actual board */}
-          <div className="relative gomoku-board">
-            {/* Board grid lines */}
-            <div 
-              className="bg-amber-200 dark:bg-amber-800"
-              style={{ 
-                width: `${BOARD_SIZE * 32}px`, 
-                height: `${BOARD_SIZE * 32}px`,
-                position: 'relative',
-                backgroundImage: `
-                  linear-gradient(to right, rgba(0,0,0,0.5) 1px, transparent 1px),
-                  linear-gradient(to bottom, rgba(0,0,0,0.5) 1px, transparent 1px)
-                `,
-                backgroundSize: '32px 32px',
-              }}
-            >
-              {/* Clickable intersections */}
+          {/* Board with row labels and grid */}
+          <div className="flex">
+            {/* Row coordinates (1-15) */}
+            <div className="flex flex-col w-6 mr-2">
+              {rowLabels.map((label, index) => (
+                <div 
+                  key={`row-${label}`} 
+                  className="flex items-center justify-center h-8 w-6 text-xs font-medium opacity-80"
+                  style={{
+                    transform: index === 0 ? 'translateY(0)' : 'translateY(0)',
+                  }}
+                >
+                  {label}
+                </div>
+              ))}
+            </div>
+            
+            {/* Actual board */}
+            <div className="relative gomoku-board">
+              {/* Board grid lines - Traditional style with lines */}
               <div 
-                className="absolute inset-0 grid"
+                className="relative bg-amber-200 dark:bg-amber-800"
                 style={{ 
-                  gridTemplateColumns: `repeat(${BOARD_SIZE}, 32px)`,
-                  gridTemplateRows: `repeat(${BOARD_SIZE}, 32px)`,
+                  width: `${(BOARD_SIZE-1) * cellSize}px`, 
+                  height: `${(BOARD_SIZE-1) * cellSize}px`,
                 }}
               >
+                {/* Horizontal lines */}
+                {Array.from({ length: BOARD_SIZE }).map((_, index) => (
+                  <div 
+                    key={`h-line-${index}`}
+                    className="absolute w-full h-[1px] bg-black/70 dark:bg-white/70"
+                    style={{ top: `${index * cellSize}px` }}
+                  />
+                ))}
+                
+                {/* Vertical lines */}
+                {Array.from({ length: BOARD_SIZE }).map((_, index) => (
+                  <div 
+                    key={`v-line-${index}`}
+                    className="absolute h-full w-[1px] bg-black/70 dark:bg-white/70"
+                    style={{ left: `${index * cellSize}px` }}
+                  />
+                ))}
+
+                {/* Clickable intersections */}
                 {board.map((row, rowIndex) => 
                   row.map((cell, colIndex) => (
                     <div 
                       key={`${rowIndex}-${colIndex}`}
                       className={`
+                        absolute w-8 h-8 -ml-4 -mt-4
                         flex items-center justify-center gomoku-intersection
-                        ${isPlayerTurn && !gameOver && cell === null ? 'cursor-pointer hover:bg-indigo-200/30' : ''}
+                        ${isPlayerTurn && !gameOver && cell === null ? 'cursor-pointer hover:bg-indigo-200/30 hover:rounded-full' : ''}
                       `}
+                      style={{
+                        left: `${colIndex * cellSize}px`,
+                        top: `${rowIndex * cellSize}px`
+                      }}
                       onClick={() => handleIntersectionClick(rowIndex, colIndex)}
                     >
                       {cell && (
@@ -109,14 +141,14 @@ export const GomokuBoard: React.FC<GomokuBoardProps> = ({
                     </div>
                   ))
                 )}
+                
+                {/* Star points (天元和星) */}
+                <div className="absolute left-1/2 top-1/2 w-2 h-2 bg-black dark:bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                <div className="absolute left-1/4 top-1/4 w-2 h-2 bg-black dark:bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                <div className="absolute left-3/4 top-1/4 w-2 h-2 bg-black dark:bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                <div className="absolute left-1/4 top-3/4 w-2 h-2 bg-black dark:bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                <div className="absolute left-3/4 top-3/4 w-2 h-2 bg-black dark:bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
               </div>
-              
-              {/* Center dot and key points */}
-              <div className="absolute left-1/2 top-1/2 w-2 h-2 bg-black dark:bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-              <div className="absolute left-1/4 top-1/4 w-2 h-2 bg-black dark:bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-              <div className="absolute left-3/4 top-1/4 w-2 h-2 bg-black dark:bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-              <div className="absolute left-1/4 top-3/4 w-2 h-2 bg-black dark:bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-              <div className="absolute left-3/4 top-3/4 w-2 h-2 bg-black dark:bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
             </div>
           </div>
         </div>
