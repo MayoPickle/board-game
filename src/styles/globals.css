@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 30, 41, 59;
+  --background-rgb: 248, 250, 252;
+  --accent-rgb: 79, 70, 229;
+  --accent-light-rgb: 224, 231, 255;
+  --board-bg-rgb: 253, 230, 138;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 241, 245, 249;
+    --background-rgb: 15, 23, 42;
+    --accent-rgb: 129, 140, 248;
+    --accent-light-rgb: 49, 46, 129;
+    --board-bg-rgb: 146, 64, 14;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.board-bg {
+  background-color: rgb(var(--board-bg-rgb));
+}
+
+/* 棋子动画效果 */
+@keyframes piece-appear {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.scale-in {
+  animation: piece-appear 0.2s ease-out forwards;
+}
+
+/* 棋盘响应式调整 */
+@media (max-width: 640px) {
+  .board-container {
+    max-width: calc(100vw - 2rem);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* 棋盘样式 */
+.gomoku-board {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.gomoku-intersection:hover::before {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: rgba(79, 70, 229, 0.15);
+  z-index: 0;
+}
+
+.gomoku-stone {
+  z-index: 1;
+  position: relative;
+}
+
+.gomoku-stone.black {
+  background: radial-gradient(circle at 30% 30%, #444, #000);
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.gomoku-stone.white {
+  background: radial-gradient(circle at 30% 30%, #fff, #ddd);
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.btn-primary {
+  @apply px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
+}
+
+.btn-secondary {
+  @apply px-4 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
+}
+
+.btn-text {
+  @apply text-indigo-600 hover:text-indigo-800 transition-colors focus:outline-none focus:underline;
+}
+
+.card {
+  @apply bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 border border-slate-200 dark:border-slate-700;
+}
+
+.input-field {
+  @apply w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700;
+}
+
+.game-container {
+  @apply max-w-4xl mx-auto w-full;
+} 
