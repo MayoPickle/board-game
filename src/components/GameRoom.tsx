@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, ReactNode } from 'react';
 import { GomokuBoard } from './GomokuBoard';
 import { GameState } from '@/lib/types';
 
@@ -7,6 +7,7 @@ interface GameRoomProps {
   playerId: string;
   onMove: (row: number, col: number) => void;
   onCreateNewRoom: () => void;
+  customBoardRenderer?: () => ReactNode;
 }
 
 export const GameRoom: React.FC<GameRoomProps> = ({
@@ -14,6 +15,7 @@ export const GameRoom: React.FC<GameRoomProps> = ({
   playerId,
   onMove,
   onCreateNewRoom,
+  customBoardRenderer,
 }) => {
   const [copied, setCopied] = useState(false);
   
@@ -141,11 +143,13 @@ export const GameRoom: React.FC<GameRoomProps> = ({
       
       <div className="flex justify-center overflow-x-auto pb-6">
         <div className="max-w-full">
-          <GomokuBoard 
-            gameState={gameState} 
-            onCellClick={onMove} 
-            playerId={playerId} 
-          />
+          {customBoardRenderer ? customBoardRenderer() : (
+            <GomokuBoard 
+              gameState={gameState} 
+              onCellClick={onMove} 
+              playerId={playerId} 
+            />
+          )}
         </div>
       </div>
       

@@ -3,95 +3,105 @@ import React, { useState } from 'react';
 interface LobbyProps {
   onCreateRoom: () => void;
   onJoinRoom: (roomId: string) => void;
+  gameType?: string;
 }
 
-export const Lobby: React.FC<LobbyProps> = ({ onCreateRoom, onJoinRoom }) => {
+export const Lobby: React.FC<LobbyProps> = ({ 
+  onCreateRoom, 
+  onJoinRoom,
+  gameType = 'gomoku'
+}) => {
   const [roomId, setRoomId] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  
+  const handleCreateRoom = () => {
+    onCreateRoom();
+  };
   
   const handleJoinRoom = (e: React.FormEvent) => {
     e.preventDefault();
-    if (roomId.trim()) {
-      onJoinRoom(roomId.trim().toUpperCase());
+    
+    if (!roomId.trim()) {
+      setError('请输入房间号');
+      return;
+    }
+    
+    onJoinRoom(roomId.trim().toUpperCase());
+  };
+  
+  const handleRoomIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRoomId(e.target.value.toUpperCase());
+    if (error) setError(null);
+  };
+
+  const getGameTitle = () => {
+    switch (gameType) {
+      case 'go':
+        return '围棋';
+      case 'gomoku':
+      default:
+        return '五子棋';
+    }
+  };
+
+  const getGameDescription = () => {
+    switch (gameType) {
+      case 'go':
+        return '围棋，起源于中国古代的战略棋类游戏，黑白双方轮流落子并围地得分。';
+      case 'gomoku':
+      default:
+        return '五子棋，简单易学的棋类游戏，黑白双方轮流落子，先连成五子者获胜。';
     }
   };
   
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="card relative overflow-hidden">
-        {/* 装饰元素 */}
-        <div className="absolute -top-6 -right-6 w-32 h-32 bg-gradient-to-bl from-purple-600/10 to-transparent rounded-full"></div>
-        <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-tr from-pink-600/10 to-transparent rounded-full"></div>
-        
-        <h2 className="text-2xl font-bold mb-8 text-center">五子棋游戏大厅</h2>
-        
-        <div className="mb-8 relative">
-          <button
-            onClick={onCreateRoom}
-            className="btn-primary w-full py-3 flex items-center justify-center gap-2 group transition-all"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 transition-transform group-hover:rotate-90">
+    <div className="card p-6 sm:p-8 relative overflow-hidden">
+      {/* 装饰元素 */}
+      <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-bl from-purple-600/10 to-transparent rounded-full"></div>
+      
+      <h2 className="text-xl font-bold mb-2">{getGameTitle()}</h2>
+      <p className="text-sm opacity-70 mb-6">{getGameDescription()}</p>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        <div className="card border-dashed border-2 p-4 flex flex-col items-center justify-center hover:border-purple-400 dark:hover:border-purple-600 transition-colors cursor-pointer"
+          onClick={handleCreateRoom}
+        >
+          <div className="mb-3 w-10 h-10 flex items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
-            创建新游戏
-          </button>
+          </div>
+          <h3 className="font-medium mb-1">创建新房间</h3>
+          <p className="text-sm opacity-70 text-center">创建一个新游戏并邀请好友加入</p>
         </div>
         
-        <div className="relative my-8">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-200 dark:border-slate-700"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">或者</span>
-          </div>
-        </div>
-        
-        <form onSubmit={handleJoinRoom}>
-          <div className="mb-4">
-            <label htmlFor="roomId" className="block text-sm font-medium mb-2 flex items-center gap-1">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-purple-500">
-                <path fillRule="evenodd" d="M11.097 1.515a.75.75 0 01.589.882L10.666 7.5h4.47l1.079-5.397a.75.75 0 111.47.294L16.665 7.5h3.585a.75.75 0 010 1.5h-3.885l-1.2 6h3.585a.75.75 0 010 1.5h-3.885l-1.08 5.397a.75.75 0 11-1.47-.294l1.02-5.103h-4.47l-1.08 5.397a.75.75 0 01-1.47-.294l1.02-5.103H3.75a.75.75 0 010-1.5h3.885l1.2-6H5.25a.75.75 0 010-1.5h4.085l1.079-5.397a.75.75 0 01.683-.588zM11.265 9l-1.2 6h4.47l1.2-6h-4.47z" clipRule="evenodd" />
-              </svg>
-              输入房间号
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                id="roomId"
+        <div className="card border-2 p-4">
+          <h3 className="font-medium mb-3 text-center">加入已有房间</h3>
+          <form onSubmit={handleJoinRoom}>
+            <div className="mb-3">
+              <input 
+                type="text" 
+                className="input-field"
+                placeholder="输入6位房间号" 
                 value={roomId}
-                onChange={(e) => setRoomId(e.target.value.toUpperCase())}
-                placeholder="例如: ABC123"
-                className="input-field pr-10"
+                onChange={handleRoomIdChange}
                 maxLength={6}
               />
-              {roomId && (
-                <button
-                  type="button"
-                  onClick={() => setRoomId('')}
-                  className="absolute top-1/2 right-2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              )}
+              {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
             </div>
-            <p className="text-xs mt-1 text-slate-500">房间号为6位字母数字组合</p>
-          </div>
-          <button
-            type="submit"
-            disabled={!roomId.trim()}
-            className="btn-secondary w-full py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-            </svg>
-            加入游戏
-          </button>
-        </form>
+            <button 
+              type="submit" 
+              className="w-full btn-primary"
+              disabled={!roomId.trim()}
+            >
+              加入游戏
+            </button>
+          </form>
+        </div>
       </div>
       
-      <div className="mt-6 text-center">
-        <p className="text-sm opacity-60">创建或加入游戏房间，与朋友一起跳入兔子洞</p>
+      <div className="text-xs opacity-50 text-center">
+        所有游戏均为实时对战，请确保您的网络连接良好
       </div>
     </div>
   );

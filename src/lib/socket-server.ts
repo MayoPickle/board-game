@@ -2,7 +2,8 @@ import { Server as NetServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import { GameState, JoinRoomPayload, MovePayload, Room } from './types';
-import { initializeGame, makeMove } from './gomoku';
+import { initializeGame as initializeGomokuGame, makeMove as makeGomokuMove } from './gomoku';
+import { initializeGame as initializeGoGame, makeMove as makeGoMove } from './go';
 
 // Store active game rooms
 const rooms: Record<string, Room> = {};
@@ -40,10 +41,20 @@ export function initSocketServer(server: NetServer) {
     socket.emit('test', { message: 'Socket connection successful!' });
 
     // Create a new room
-    socket.on('create_room', () => {
+    socket.on('create_room', (data: { gameType?: string } = {}) => {
       try {
+        const gameType = data.gameType || 'gomoku'; // Default to gomoku
         const roomId = generateRoomId();
-        const gameState = initializeGame(roomId);
+        let gameState: GameState;
+        
+        // Initialize the appropriate game type
+        if (gameType === 'go') {
+          gameState = initializeGoGame(roomId);
+          console.log(`Creating Go game room: ${roomId}`);
+        } else {
+          gameState = initializeGomokuGame(roomId);
+          console.log(`Creating Gomoku game room: ${roomId}`);
+        }
         
         rooms[roomId] = {
           id: roomId,
@@ -51,8 +62,7 @@ export function initSocketServer(server: NetServer) {
           createdAt: Date.now(),
         };
 
-        socket.emit('room_created', { roomId });
-        console.log(`Room created: ${roomId}`);
+        socket.emit('room_created', { roomId, gameType });
       } catch (error) {
         console.error('Error creating room:', error);
         socket.emit('error', { message: 'Failed to create room' });
@@ -138,8 +148,18 @@ export function initSocketServer(server: NetServer) {
           return;
         }
 
-        // Make the move and update the game state
-        const updatedGameState = makeMove(room.game, row, col);
+        // Make the move based on the game type
+        let updatedGameState: GameState;
+        
+        // Determine game type
+        const isGoGame = room.game.meta && 'captures' in room.game.meta;
+        
+        if (isGoGame) {
+          updatedGameState = makeGoMove(room.game, row, col);
+        } else {
+          updatedGameState = makeGomokuMove(room.game, row, col);
+        }
+        
         room.game = updatedGameState;
 
         console.log(`Move made: room=${roomId}, player=${playerId}, row=${row}, col=${col}`);

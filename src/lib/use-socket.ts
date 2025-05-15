@@ -106,10 +106,10 @@ export const useSocket = () => {
   }, [playerId]);
 
   // Create a new game room
-  const createRoom = () => {
+  const createRoom = (gameType?: string) => {
     if (!socket) return;
-    console.log('Creating room');
-    socket.emit('create_room');
+    console.log(`Creating ${gameType || 'gomoku'} room`);
+    socket.emit('create_room', { gameType });
   };
 
   // Join an existing game room

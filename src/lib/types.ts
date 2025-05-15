@@ -2,6 +2,16 @@
 export type Player = 'black' | 'white';
 export type CellState = Player | null;
 
+interface GameMeta {
+  captures?: {
+    black: number;
+    white: number;
+  };
+  previousBoard?: CellState[][] | null;
+  passes?: number;
+  resigned?: boolean;
+}
+
 export interface GameState {
   board: CellState[][];
   currentPlayer: Player;
@@ -13,6 +23,7 @@ export interface GameState {
     white?: string;
   };
   spectators: string[];
+  meta?: GameMeta;
 }
 
 export interface Room {
